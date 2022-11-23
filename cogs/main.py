@@ -38,33 +38,56 @@ class MainCog(CM.Cog):
 	###
 
 	@AC.command(name="add-suggestions", description="Add objects to the lists for this server.")
-	async def add_suggestions(self, itr:Itr, group:Literal["Names", "Games", "Enemies", "People", "Powerups"]="Enemies", suggestion:str=None):
+	@AC.describe(group="The group that the suggestion(s) will be appended to.", suggestion="The suggestion or group of suggestions (separated by commas) to be added to the group.")
+	async def add_suggestions(self, itr:Itr, group:Literal["Names", "Games", "Enemies", "People", "Powerups", "Objects"]="Enemies", suggestion:str=None):
 		if not suggestion:
-			await itr.response.send_message("The Suggestion field is required, try again!", ephemeral=True)
+			return await itr.response.send_message("The Suggestion field is required, try again!", ephemeral=True)
+		if "{" in suggestion or "}" in suggestion or "$" in suggestion:
+			return await itr.response.send_message("The Suggestion field can not contain '{' '}' or '$'!", ephemeral=True)
+		suggestions = [s.strip() for s in suggestions.split(",")]
 
 		valuename = "custom_" + group.lower()
 		grouplist = self.client.CON.get_value(itr.guild, valuename)
-		grouplist.append(suggestion)
+		if len(suggestions) > 1:
+			for s in suggestions:
+				grouplist.append(s)
+			embed = discord.Embed(title=f"Added {len(suggestions)} suggestions to the `{group}` list!", description="```\n- " + '\n- '.join(suggestions) + "```",color=discord.Color.brand_red())
+		else:
+			grouplist.append(suggestion)
+			embed = discord.Embed(title=f"Added '{suggestion}' to the `{group}` list!", color=discord.Color.brand_red())
+
 		await self.client.CON.set_value(itr.guild, valuename, grouplist)
-		
-		embed = discord.Embed(title=f"Added '{suggestion}' to the `{group}` list!", color=discord.Color.brand_red())
 		await itr.response.send_message(embed=embed)
 
 	@AC.command(name="remove-suggestions", description="Remove objects from the lists for this server. (Make sure suggestion is exactly the same!)")
-	async def remove_suggestions(self, itr:Itr, group:Literal["Names", "Games", "Enemies", "People", "Powerups"]="Enemies", suggestion:str=None):
+	@AC.describe(group="The group that the suggestion(s) will be removed from.", suggestion="The suggestion or group of suggestions (separated by commas) to be removed from the group.")
+	async def remove_suggestions(self, itr:Itr, group:Literal["Names", "Games", "Enemies", "People", "Powerups", "Objects"]="Enemies", suggestion:str=None):
 		if not suggestion:
-			await itr.response.send_message("The Suggestion field is required, try again!", ephemeral=True)
+			return await itr.response.send_message("The Suggestion field is required, try again!", ephemeral=True)
+		suggestions = suggestion.strip().split(",")
 
 		valuename = "custom_" + group.lower()
 		grouplist:list = self.client.CON.get_value(itr.guild, valuename)
-		if suggestion in grouplist:
-			grouplist.remove(suggestion)
-		await self.client.CON.set_value(itr.guild, valuename, grouplist)
+		if len(suggestions) > 1:
+			count = 0
+			removedsuggestions = []
+			for s in suggestions:
+				if s in grouplist:
+					removedsuggestions.append(s)
+					grouplist.remove(s)
+					count += 1
+			embed = discord.Embed(title=f"Removed {count} of {len(suggestions)} suggestions from the `{group}` list!", description="```\n- " + '\n- '.join(removedsuggestions) + "```", color=discord.Color.brand_red())
+		else:
+			if suggestion in grouplist:
+				grouplist.remove(suggestion)
+				embed = discord.Embed(title=f"Removed '{suggestion}' from the `{group}` list!", color=discord.Color.brand_red())
+			else:
+				embed = discord.Embed(title=f"Could not find '{suggestion}' in the `{group}` list, try again!", color=discord.Color.brand_red())
 
-		embed = discord.Embed(title=f"Removed '{suggestion}' from the `{group}` list!", color=discord.Color.brand_red())
+		await self.client.CON.set_value(itr.guild, valuename, grouplist)
 		await itr.response.send_message(embed=embed)
 
-	@AC.command(name="list-suggestions", description="List objects from all the lists for this server.")
+	@AC.command(name="list-suggestions", description="List custom enteries from all the lists for this server.")
 	async def list_suggestions(self, itr:Itr):
 		page = 0
 		pages = []
@@ -119,12 +142,16 @@ class MainCog(CM.Cog):
 
 	###
 
-	@AC.command(name="generate", description="Gaenerate some suggestions.")
-	@AC.describe(mode="If the sugegstions returned will show big images (up to 4) or thumbnails (only 1)", logs="If older suggestions are saved to a thread.")
-	async def generate(self, itr:Itr, mode:Literal["Simple", "Full"]="Simple", logs:Literal["Enabled", "Disabled"]="Enabled"):
+	@AC.command(name="generate", description="Generate some suggestions.")
+	@AC.describe(
+		mode="If the sugegstions returned will show big images (up to 4) or thumbnails (only 1)",
+		logs="If older suggestions are saved to a thread.",
+		suggestions="What suggestions are used, both, just default or just custom"
+	)
+	async def generate(self, itr:Itr, mode:Literal["Simple", "Full"]="Simple", logs:Literal["Enabled", "Disabled"]="Enabled", suggestions:Literal["Both", "Just Default", "Just Custom"]="Both"):
 		THREAD:discord.Thread|None = None
 		page = 0
-		pages = [self.createSuggestion(itr, mode)]
+		pages = [self.createSuggestion(itr, mode, suggestions)]
 
 		def getView(timeout=False):
 			first = (page == 0)
@@ -148,7 +175,7 @@ class MainCog(CM.Cog):
 		while True:
 			try:
 				butitr:Itr = await self.client.wait_for("interaction", timeout=90, check=check)
-				if butitr.user == itr.user:
+				if butitr.user == itr.user or butitr.user == self.client.owner_id:
 					await butitr.response.defer()
 					if butitr.data["custom_id"] == "left":
 						page -= 1
@@ -157,16 +184,17 @@ class MainCog(CM.Cog):
 							
 					elif butitr.data["custom_id"] == "right":
 						page += 1
-						if page > len(pages)-1:
-							pages.append(self.createSuggestion(itr, mode))
+						if page > len(pages)-1 and len(pages) < 99:
+							pages.append(self.createSuggestion(itr, mode, suggestions))
 							if logs == "Enabled":
 								if not THREAD:
 									THREAD = await MSG.create_thread(name=f"Older Suggestions ({MSG.id})", auto_archive_duration=60)
 								await THREAD.send(content=f"Page {page}:", embeds=pages[page-1])
 
 					elif butitr.data["custom_id"] == "close":
-						if logs == "Enabled":
+						if logs == "Enabled" and THREAD:
 							await THREAD.send(content=f"Page {len(pages)}:", embeds=pages[len(pages)-1])
+							await THREAD.edit(archived=True, locked=True)
 						return await itr.edit_original_response(view=getView(True))
 
 					await itr.edit_original_response(embeds=pages[page], view=getView())
@@ -175,11 +203,12 @@ class MainCog(CM.Cog):
 			except asyncio.TimeoutError:
 				if logs == "Enabled" and THREAD:
 					await THREAD.send(content=f"Page {len(pages)}:", embeds=pages[len(pages)-1])
+					await THREAD.edit(archived=True, locked=True)
 				return await itr.edit_original_response(view=getView(True))
 
-	def createSuggestion(self, itr:Itr, mode):
+	def createSuggestion(self, itr:Itr, mode, custom_suggestions):
 		values = self.client.CON.get_group(itr.guild)
-		suggestion, images = createSuggestion(itr, values)
+		suggestion, images = createSuggestion(itr, values, custom_suggestions)
 		if mode == "Simple":
 			embed = discord.Embed(title="New suggestion fresh from the oven:", description=suggestion, color=discord.Color.brand_red())
 			if len(images) > 0: embed.set_thumbnail(url=images[0])
