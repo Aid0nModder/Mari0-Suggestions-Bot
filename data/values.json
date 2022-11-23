@@ -1,0 +1,32 @@
+{
+    "custom_names": {
+        "default": [],
+        "help":"Names",
+        "type":"list"
+    },
+    "custom_games": {
+        "default": [],
+        "help":"Games",
+        "type":"list"
+    },
+    "custom_enemies": {
+        "default": [],
+        "help":"Enemies",
+        "type":"list"
+    },
+    "custom_people": {
+        "default": [],
+        "help":"People",
+        "type":"list"
+    },
+    "custom_powerups": {
+        "default": [],
+        "help":"Powerups",
+        "type":"list"
+    },
+    "custom_objects": {
+        "default": [],
+        "help":"Objects",
+        "type":"list"
+    }
+}

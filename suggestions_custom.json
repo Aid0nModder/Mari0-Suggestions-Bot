@@ -1,0 +1,77 @@
+{
+    "_origin": [
+        "{name} {priority_p} {action_p} {someall_p}{extra}{end_p}",
+        "{name} {priority_n} {action_n} {someall_p}{extra}{end_p}",
+        "{name} {priority_p} {action_n} {someall_n}{extra}{end_n}",
+        "{name} {priority_n} {action_p} {someall_n}{extra}{end_n}",
+
+        "when will {name} {action_p} {someall_p}{extra}{end_p}",
+        "when will {name} {action_n} {someall_n}{extra}{end_n}",
+        "when will {name} finally {action_p} {someall_p}{extra}{end_p}",
+        "when will {name} finally {action_n} {someall_n}{extra}{end_n}",
+        "when will {name} decide to {action_p} {someall_p}{extra}{end_p}",
+        "when will {name} decide to {action_n} {someall_n}{extra}{end_n}",
+
+        "why did {name} {action_p} {someall_n}{extra}{end_n}",
+        "why did {name} {action_n} {someall_p}{extra}{end_p}",
+        "why did {name} decide to {action_p} {someall_n}{extra}{end_n}",
+        "why did {name} decide to {action_n} {someall_p}{extra}{end_p}"
+    ],
+    "extra": [ "", "", " from {games}", " in {version}", " from {games} in {version}" ],
+
+    "punctuation": [ "", ".", "...", "?", "???", "!", "!!!", "!!!!!!!!" ],
+    "punctuationcont": [ ".", "...", ",", "?", "!" ],
+
+    "end_p": [ "{punctuation}", "{punctuation}", "{punctuationcont} {true_end_p}{punctuation}" ],
+    "true_end_p": [ "It's the best", "We need it", "It's so cool", "It's required", "I need it for a mappack", "It would be awesome", "Pleaseee" ],
+
+    "end_n": [ "{punctuation}", "{punctuation}", "{punctuationcont} {true_end_n}{punctuation}" ],
+    "true_end_n": [ "It's the wirst", "We don't need it", "It's not cool", "No one needs it", "It would be stupid", "Just don't do it" ],
+
+    "end_device": [ "{punctuation}", "{punctuation}", "{punctuationcont} {true_end_device}{punctuation}" ],
+    "true_end_device": [ "You'll get so many more players", "So many people need it", "It would be unfair not to", "Pleaseee", "I need it" ],
+
+    "end_dlc": [ "{punctuation}", "{punctuation}", "{punctuationcont} {true_end_dlc}{punctuation}" ],
+    "true_end_dlc": [ "It would be cool", "It would be fun", "It would be interesting", "Everyone would love it", "It would be da best", "It would be the best", "We would love it" ],
+
+    "name": [ "{alesan}" ],
+    "alesan": [],
+
+    "games": [],
+
+    "version": [
+        "the next update", "the next update", "another update", "V{versionnumbers}", "Version {versionnumbers}", "V{versionnumbers}", "Version {versionnumbers}",
+        "V{versionnumbers}{versionend}", "Version {versionnumbers}{versionend}", "V{versionnumbers}{versionendb}", "Version {versionnumbers}{versionendb}",
+        "V{versionnumbers}{versionend}{versionendb}", "Version {versionnumbers}{versionend}{versionendb}"
+    ],
+    "versionnumbers": [ "0","1","2","3","4","5","6","7","8","9","10","11","12","13","13","13","14","14","14","14","14","15","15","15","16","20","30","69","99","420","99999" ],
+    "versionend": [ ".1", ".1", ".1", ".1.1", ".2", ".3", ".4" ],
+    "versionendb": [ " Beta", " Alpha", " Pre-release" ],
+
+    "priority_p": [ "could", "should", "must", "absolutely must" ],
+    "priority_n": [ "can't", "shouldn't", "musn't", "absolutely musn't" ],
+
+    "action_p": [ "add", "buff", "update", "add more uses for" ],
+    "action_n": [ "remove", "nerf","add less uses for", "just, give up on" ],
+
+    "someall_p": [ "{someenemies_p}", "{someenemies_p}", "{someenemies_p}", "{someobjects_p}", "{someobjects_p}", "{somepeople_p}", "{somepowerups_p}" ],
+    "someall_n": [ "{someenemies_n}", "{someenemies_n}", "{someenemies_n}", "{someobjects_n}", "{someobjects_n}", "{somepeople_n}", "{somepowerups_n}" ],
+
+    "someenemies_p": [ "{enemies}", "{enemies}", "{enemies}", "{enemies} and {enemies}", "{enemies}, {enemies} and {enemies}", "my favourite enemy, {enemies}", "the best enemy, {enemies}" ],
+    "someenemies_n": [ "{enemies}", "{enemies}", "{enemies}", "{enemies} and {enemies}", "{enemies}, {enemies} and {enemies}", "my least favourite enemy, {enemies}", "the worst enemy, {enemies}" ],
+    "enemies": [],
+
+    "somepeople_p": [ "{people}", "{people} and {people}", "{people}, {people} and {people}", "my favourite character, {people}", "the best character, {people}" ],
+    "somepeople_n": [ "{people}", "{people} and {people}", "{people}, {people} and {people}", "my least favourite character, {people}", "the worst character, {people}" ],
+    "people": [],
+
+    "somepowerups_p": [ "{powerups}", "{powerups} and {powerups}", "{powerups}, {powerups} and {powerups}", "my favourite powerup, {powerups}", "the best powerup, {powerups}" ],
+    "somepowerups_n": [ "{powerups}", "{powerups} and {powerups}", "{powerups}, {powerups} and {powerups}", "my least favourite powerup, {powerups}", "the worst powerup, {powerups}" ],
+    "powerups": [],
+
+    "someobjects_p": [ "{objects}", "{objects} and {objects}", "{objects}, {objects} and {objects}", "my favourite powerup, {objects}", "the best object, {objects}" ],
+    "someobjects_n": [ "{objects}", "{objects} and {objects}", "{objects}, {objects} and {objects}", "my least favourite powerup, {objects}", "the worst object, {objects}" ],
+    "objects": [],
+
+    "_images": {}
+}
